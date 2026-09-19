@@ -39,10 +39,10 @@ jobs:
           git commit -m "Update popup state [skip ci]" || echo "No changes to commit"
           git push
 
-      - name: 변경 감지 시 Github Issue로 알림 생성
+      - name: 변경 감지 시 텔레그램으로 알림 전송
         if: steps.monitor.outputs.changed == 'true'
-        uses: peter-evans/create-issue-from-file@v4
+        uses: appleboy/telegram-action@master
         with:
-          title: "🚨 빌라드지디 수서 팝업 변경 감지"
-          content-filepath: ./message.md
-          labels: notification
+          to: ${{ secrets.CHAT_ID }}
+          token: ${{ secrets.API_KEY }}
+          message_file: ./message.md

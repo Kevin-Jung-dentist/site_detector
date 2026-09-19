@@ -71,15 +71,15 @@ def main():
             with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
                 f.write(f"changed=true\n")
         
-        # Prepare a markdown message
-        message = "🚨 **수서 빌라드지디 팝업 변경 감지!** 🚨\n\n"
+        # Prepare a clean text message for Telegram
+        message = "🚨 수서 빌라드지디 팝업 변경 감지! 🚨\n\n"
         message += "새로운 팝업 목록이 업데이트되었습니다:\n\n"
         for idx, p in enumerate(current_popups, 1):
-            message += f"### 팝업 {idx}\n"
-            message += f"- **시작일**: {p['start']}\n"
-            message += f"- **종료일**: {p['end']}\n"
-            message += f"- **연결 링크**: {p['link']}\n"
-            message += f"- **이미지**: ![{idx}]({p['image']})\n\n"
+            message += f"📌 [팝업 {idx}]\n"
+            message += f"시작일: {p['start']}\n"
+            message += f"종료일: {p['end']}\n"
+            message += f"링크: {p['link']}\n"
+            message += f"이미지: {p['image']}\n\n"
             
         with open('message.md', 'w', encoding='utf-8') as f:
             f.write(message)
