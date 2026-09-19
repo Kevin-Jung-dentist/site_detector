@@ -1,0 +1,48 @@
+name: Popup Monitor
+
+on:
+  schedule:
+    # 6시간마다 실행 (UTC 기준 0, 6, 12, 18시)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # 수동 실행 버튼 활성화
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check-popup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+        
+      - name: Python 환경 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          
+      - name: 의존성 패키지 설치
+        run: pip install -r requirements.txt
+        
+      - name: 팝업 감지 스크립트 실행
+        id: monitor
+        run: python monitor.py
+        
+      - name: 변경된 상태 저장 및 푸시
+        if: steps.monitor.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add popup_state.json
+          git commit -m "Update popup state [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: 변경 감지 시 Github Issue로 알림 생성
+        if: steps.monitor.outputs.changed == 'true'
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: "🚨 빌라드지디 수서 팝업 변경 감지"
+          content-filepath: ./message.md
+          labels: notification
